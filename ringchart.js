@@ -4,13 +4,44 @@ window.ring_chart = function( container ) {
 
 	// Returns a coordinate set relative to the axis of the arc
 	rc.pointOnArc = function( degrees, radius, center ) {
+		// position is calculated from sine/cosine of 
+		// radius and center are used to offset the position
 		return {
 			x: center.x + radius * Math.cos( degrees * (Math.PI / 180) ),
 			y: center.y + radius * Math.sin( degrees * (Math.PI / 180) )
 		};
 	};
 
-	// Settings for our svg
+	// Tools for drawing an SVG Path
+	rc.draw = {
+		// SVG MoveTo: M x,y
+		moveTo: function( coord ) {
+			return 'M ' + coord.x + ',' + coord.y + ' ';
+		},
+		
+		// SVG LineTo: L x,y
+		lineTo: function( coord ) {
+			return 'L ' + coord.x + ',' + coord.y + ' ';
+		},
+		
+		// SVG ArcTo:  A rx,ry xAxisRotate LargeArcFlag,SweepFlag x,y
+		arcTo: function( radius, coord, largeArc, clockwise ) {
+			var arc  = 'A ';
+				arc += radius + ',' + radius + ' ';
+				arc += '0 ';
+				arc += largeArc + ',' + clockwise + ' ';
+				arc += coord.x + ',' + coord.y;
+			return arc;
+		},
+		
+		// SVG close path: z
+		close: function() {
+			return 'z';
+		}
+	};
+
+
+	// Settings for our svg wrapper element
 	var svg = {
 		w: container.clientWidth,
 		h: container.clientHeight,
@@ -21,11 +52,15 @@ window.ring_chart = function( container ) {
 	};
 	svg.el = new LilSVG( 'svg', { width: svg.w, height: svg.h } );
 
+
+	// The colored ring
 	var ring = {
 		val: String( container.dataset.value ),
 		max: 100,
 		radius: Math.min( svg.w, svg.h ) * 0.4
 	};
+
+	// make sure the data is workable
 	if ( ring.val.indexOf('%') != -1 ) {
 		ring.val = ring.val.replace('%', '');
 		ring.max = 100;
@@ -37,21 +72,47 @@ window.ring_chart = function( container ) {
 	}
 
 	ring.deg = Math.min( (ring.val / ring.max), 1 ) * 360;
-	ring.radians = ring.deg * (Math.PI / 180);
 
-	ring.filled = {
-		d: '',
-		points: [
-			rc.pointOnArc( 0,        ring.radius,      svg.center ),
-			rc.pointOnArc( ring.deg, ring.radius,      svg.center ),
-			rc.pointOnArc( ring.deg, ring.radius - 20, svg.center ),
-			rc.pointOnArc( 0,        ring.radius - 20, svg.center )
-		]
-	};
+	ring.segments = [];
+
+	if (ring.deg > 0) {
+		var filled = { className: 'filled', points: [] };
+
+		filled.points.push( rc.pointOnArc( 0, ring.radius, svg.center ) );
+		// if (ring.deg == 360)
+			// filled.points.push( rc.pointOnArc( 179, ring.radius, svg.center ) );
+		filled.points.push( rc.pointOnArc( ring.deg, ring.radius, svg.center ) );
+		filled.points.push( rc.pointOnArc( ring.deg, ring.radius - 20, svg.center ) );
+		// if (ring.deg == 360)
+			// filled.points.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
+		filled.points.push( rc.pointOnArc( 0, ring.radius - 20, svg.center ) );
+
+		ring.segments.push( filled );
+	}
+
+	if (ring.deg < 360) {
+		var empty = { className: 'empty', points: [] };
+
+		empty.points.push( rc.pointOnArc( ring.deg, ring.radius, svg.center ) );
+		// if (ring.deg == 360)
+			// empty.points.push( rc.pointOnArc( 179, ring.radius, svg.center ) );
+		empty.points.push( rc.pointOnArc( 0, ring.radius, svg.center ) );
+		empty.points.push( rc.pointOnArc( 0, ring.radius - 20, svg.center ) );
+		// if (ring.deg == 360)
+			// empty.points.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
+		empty.points.push( rc.pointOnArc( ring.deg, ring.radius - 20, svg.center ) );
+
+		ring.segments.push( empty );
+	}
+
+	for (var i = 0; i < ring.segments.length; i++) {
+		ring.segments[i].d = rc.draw.moveTo();
+		ring.segments[i].d = rc.draw.arcTo();
+	}
+
+	/*
 	var p = ring.filled.points;
 
-	// SVG MoveTo: M x,y
-	// SVG ArcTo:  A rx,ry xAxisRotate LargeArcFlag,SweepFlag x,y
 	if (ring.deg > 0) {
 		ring.filled.d += 'M ' + p[0].x + ',' + p[0].y + ' ';
 		if (ring.deg == 360) {
@@ -90,7 +151,10 @@ window.ring_chart = function( container ) {
 		ring.empty.el = new LilSVG( 'path', { 'class': 'empty', d: ring.empty.d, transform: 'rotate(-90 '+ svg.center.x +' ' + svg.center.y + ')' } );
 		svg.el.appendChild( ring.empty.el );
 	}
+	*/
 
+
+	// The label in the middle
 	var text = new LilSVG( 'text', {
 			'class': 'label',
 			'text-anchor': 'middle',
