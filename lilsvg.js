@@ -3,14 +3,14 @@
  *
  * @usage:
  *   var mySVG = new LilSVG();
- *   --> <svg version="1.1"></svg>
+ *   --> <svg version="1.2"></svg>
  *
- *   var yourSVG = new LilSVG('svg', { viewbox: '0 0 500 500' });
- *   --> <svg version="1.1" viewbox="0 0 500 500"></svg>
+ *   var yourSVG = new LilSVG('svg', { viewPort: '0 0 500 500' });
+ *   --> <svg version="1.2" viewPort="0 0 500 500"></svg>
  *
  *   var myCircle = new LilSVG('circle', { cx: 250, cy: 250, r: 100 });
  *   yourSVG.appendChild( myCirle );
- *   --> <svg version="1.1" viewbox="0 0 500 500"> <circle cx="250" cy="250" r="100"/> </svg>
+ *   --> <svg version="1.2" viewPort="0 0 500 500"> <circle cx="250" cy="250" r="100"/> </svg>
  */
 
 var LilSVG = function( type, attrs ) {
