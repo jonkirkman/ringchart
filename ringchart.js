@@ -57,18 +57,24 @@ window.ring_chart = function( container ) {
 	var ring = {
 		val: String( container.dataset.value ),
 		max: 100,
-		radius: Math.min( svg.w, svg.h ) * 0.4
+		radius: Math.min( svg.w, svg.h ) * 0.4,
+		suffix: (container.dataset.suffix ? String( container.dataset.suffix ) : ''),
+		prefix: (container.dataset.prefix ? String( container.dataset.prefix ) : '')
 	};
 
 	// make sure the data is workable
 	if ( ring.val.indexOf('%') != -1 ) {
 		ring.val = ring.val.replace('%', '');
-		ring.max = 100;
+		ring.suffix += '%';
 	}
 	else if ( ring.val.indexOf('/') != -1 ) {
 		var temp = ring.val.split('/');
 		ring.val = temp[0];
 		ring.max = temp[1];
+	}
+
+	if ( ring.suffix.indexOf('%') != -1) {
+		ring.max = 100;
 	}
 
 	ring.deg = Math.min( (ring.val / ring.max), 1 ) * 360;
@@ -163,6 +169,19 @@ window.ring_chart = function( container ) {
 			y: svg.center.y
 		});
 		text.textContent = ring.val;
+
+	var prefix = new LilSVG( 'tspan', {
+			class: 'label-prefix'
+		});
+		prefix.textContent = ring.prefix;	
+		text.insertBefore( prefix, text.firstChild );
+	
+	var suffix = new LilSVG( 'tspan', {
+			class: 'label-suffix'
+		});
+		suffix.textContent = ring.suffix;
+		text.appendChild(suffix);
+
 	svg.el.appendChild( text );
 
 	container.appendChild( svg.el );
