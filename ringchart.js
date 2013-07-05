@@ -58,6 +58,7 @@ window.ring_chart = function( container ) {
 		val: String( container.dataset.value ),
 		max: 100,
 		radius: Math.min( svg.w, svg.h ) * 0.5,
+		thickness: (Number( container.dataset.thickness ) || 20),
 		suffix: (container.dataset.suffix ? String( container.dataset.suffix ) : ''),
 		prefix: (container.dataset.prefix ? String( container.dataset.prefix ) : '')
 	};
@@ -88,10 +89,10 @@ window.ring_chart = function( container ) {
 		// if (ring.deg == 360)
 			// filled.points.push( rc.pointOnArc( 179, ring.radius, svg.center ) );
 		filled.points.push( rc.pointOnArc( ring.deg, ring.radius, svg.center ) );
-		filled.points.push( rc.pointOnArc( ring.deg, ring.radius - 20, svg.center ) );
+		filled.points.push( rc.pointOnArc( ring.deg, ring.radius - ring.thickness, svg.center ) );
 		// if (ring.deg == 360)
-			// filled.points.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
-		filled.points.push( rc.pointOnArc( 0, ring.radius - 20, svg.center ) );
+			// filled.points.push( rc.pointOnArc( 179, ring.radius - ring.thickness, svg.center ) );
+		filled.points.push( rc.pointOnArc( 0, ring.radius - ring.thickness, svg.center ) );
 
 		ring.segments.push( filled );
 	}
@@ -103,10 +104,10 @@ window.ring_chart = function( container ) {
 		// if (ring.deg == 360)
 			// empty.points.push( rc.pointOnArc( 179, ring.radius, svg.center ) );
 		empty.points.push( rc.pointOnArc( 0, ring.radius, svg.center ) );
-		empty.points.push( rc.pointOnArc( 0, ring.radius - 20, svg.center ) );
+		empty.points.push( rc.pointOnArc( 0, ring.radius - ring.thickness, svg.center ) );
 		// if (ring.deg == 360)
-			// empty.points.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
-		empty.points.push( rc.pointOnArc( ring.deg, ring.radius - 20, svg.center ) );
+			// empty.points.push( rc.pointOnArc( 179, ring.radius - ring.thickness, svg.center ) );
+		empty.points.push( rc.pointOnArc( ring.deg, ring.radius - ring.thickness, svg.center ) );
 
 		ring.segments.push( empty );
 	}
@@ -128,10 +129,10 @@ window.ring_chart = function( container ) {
 		ring.filled.d += 'A ' + ring.radius + ',' + ring.radius + ' 0 ' + (ring.deg < 180 ? 0 :1) + ',1 ' + p[1].x + ',' + p[1].y + ' ';
 		ring.filled.d += 'L ' + p[2].x + ',' + p[2].y + ' ';
 		if (ring.deg == 360) {
-			p.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
-			ring.filled.d += 'A ' + (ring.radius - 20) + ',' + (ring.radius - 20) + ' 0 1,0 ' + p[5].x + ',' + p[5].y + ' ';
+			p.push( rc.pointOnArc( 179, ring.radius - ring.thickness, svg.center ) );
+			ring.filled.d += 'A ' + (ring.radius - ring.thickness) + ',' + (ring.radius - ring.thickness) + ' 0 1,0 ' + p[5].x + ',' + p[5].y + ' ';
 		}
-		ring.filled.d += 'A ' + (ring.radius - 20) + ',' + (ring.radius - 20) + ' 0 ' + (ring.deg < 180 ? 0 :1) + ',0 ' + p[3].x + ',' + p[3].y + ' ';
+		ring.filled.d += 'A ' + (ring.radius - ring.thickness) + ',' + (ring.radius - ring.thickness) + ' 0 ' + (ring.deg < 180 ? 0 :1) + ',0 ' + p[3].x + ',' + p[3].y + ' ';
 		ring.filled.d += 'z';
 
 		ring.filled.el = new LilSVG( 'path', { 'class': 'filled', d: ring.filled.d, transform: 'rotate(-90 '+ svg.center.x +' ' + svg.center.y + ')' } );
@@ -148,10 +149,10 @@ window.ring_chart = function( container ) {
 		ring.empty.d += 'A ' + ring.radius + ',' + ring.radius + ' 0 ' + (ring.deg > 180 ? 0 :1) + ',0 ' + p[1].x + ',' + p[1].y + ' ';
 		ring.empty.d += 'L ' + p[2].x + ',' + p[2].y + ' ';
 		if (ring.deg === 0) {
-			p.push( rc.pointOnArc( 179, ring.radius - 20, svg.center ) );
-			ring.empty.d += 'A ' + (ring.radius - 20) + ',' + (ring.radius - 20) + ' 0 1,1 ' + p[5].x + ',' + p[5].y + ' ';
+			p.push( rc.pointOnArc( 179, ring.radius - ring.thickness, svg.center ) );
+			ring.empty.d += 'A ' + (ring.radius - ring.thickness) + ',' + (ring.radius - ring.thickness) + ' 0 1,1 ' + p[5].x + ',' + p[5].y + ' ';
 		}
-		ring.empty.d += 'A ' + (ring.radius - 20) + ',' + (ring.radius - 20) + ' 0 ' + (ring.deg > 180 ? 0 :1) + ',1 ' + p[3].x + ',' + p[3].y + ' ';
+		ring.empty.d += 'A ' + (ring.radius - ring.thickness) + ',' + (ring.radius - ring.thickness) + ' 0 ' + (ring.deg > 180 ? 0 :1) + ',1 ' + p[3].x + ',' + p[3].y + ' ';
 		ring.empty.d += 'z';
 		
 		ring.empty.el = new LilSVG( 'path', { 'class': 'empty', d: ring.empty.d, transform: 'rotate(-90 '+ svg.center.x +' ' + svg.center.y + ')' } );
