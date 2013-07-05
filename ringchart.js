@@ -7,8 +7,8 @@ window.ring_chart = function( container ) {
 		// position is calculated from sine/cosine of 
 		// radius and center are used to offset the position
 		return {
-			x: center.x + radius * Math.cos( degrees * (Math.PI / 180) ),
-			y: center.y + radius * Math.sin( degrees * (Math.PI / 180) )
+			x: center.x + (radius * Math.cos( degrees * (Math.PI / 180) )),
+			y: center.y + (radius * Math.sin( degrees * (Math.PI / 180) ))
 		};
 	};
 
@@ -57,7 +57,7 @@ window.ring_chart = function( container ) {
 	var ring = {
 		val: String( container.dataset.value ),
 		max: 100,
-		radius: Math.min( svg.w, svg.h ) * 0.4,
+		radius: Math.min( svg.w, svg.h ) * 0.5,
 		suffix: (container.dataset.suffix ? String( container.dataset.suffix ) : ''),
 		prefix: (container.dataset.prefix ? String( container.dataset.prefix ) : '')
 	};
